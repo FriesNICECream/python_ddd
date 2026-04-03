@@ -15,28 +15,90 @@ alembic/           # 数据库迁移
 
 ## 快速开始
 
-1. 安装依赖
+### 1. 安装 Poetry
+
+确认本机已安装 Poetry：
 
 ```bash
-pip install -e .
+poetry --version
 ```
 
-2. 配置环境变量（可选）
+### 2. 安装依赖
+
+在项目根目录执行：
+
+```bash
+poetry install
+```
+
+如果你希望为当前项目创建项目内专用虚拟环境，先执行：
+
+```bash
+poetry config virtualenvs.in-project true
+```
+
+然后再执行：
+
+```bash
+poetry install
+```
+
+本项目默认将 Poetry 作为依赖与虚拟环境管理工具使用，不要求将当前仓库打包安装为独立 Python 包。
+
+### 3. 配置环境变量
+
+复制环境变量示例文件：
 
 ```bash
 cp .env.example .env
 ```
 
-3. 执行迁移
+如果你使用的是 PowerShell，也可以执行：
 
-```bash
-alembic upgrade head
+```powershell
+Copy-Item .env.example .env
 ```
 
-4. 启动服务
+### 4. 按需修改 `.env`
+
+至少确认以下配置：
+
+```env
+DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/python_ddd
+APP_NAME=Python DDD
+ACCESS_TOKEN_SECRET=change-me-in-production
+ACCESS_TOKEN_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+```
+
+### 5. 执行迁移
+
+使用 Poetry 运行 Alembic：
 
 ```bash
-uvicorn app.main:app --reload
+poetry run alembic upgrade head
+```
+
+### 6. 启动服务
+
+使用 Poetry 启动 FastAPI：
+
+```bash
+poetry run uvicorn app.main:app --reload
+```
+
+默认启动后可访问：
+
+- 服务地址：`http://127.0.0.1:8000`
+- 健康检查：`http://127.0.0.1:8000/health`
+- Swagger 文档：`http://127.0.0.1:8000/docs`
+
+### 7. 运行测试
+
+如需验证当前项目状态，可执行：
+
+```bash
+poetry run pytest
 ```
 
 ## Auth 模块
