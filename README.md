@@ -39,9 +39,10 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-## User 模块
+## Auth 模块
 
-- `POST /api/users`：用户注册
+- `POST /api/auth/register`：用户注册
+- `POST /api/auth/login`：用户登录并获取访问令牌
 - `GET /api/users/{user_id}`：按 ID 查询用户
 
 示例请求：
@@ -49,6 +50,20 @@ uvicorn app.main:app --reload
 ```json
 {
   "email": "alice@example.com",
-  "full_name": "Alice"
+  "full_name": "Alice",
+  "password": "strong-pass"
 }
 ```
+
+## 开发执行机制
+
+仓库内新增了开发执行机制设计说明，定义以下四项约束如何落地：
+
+- `Spec-driven`
+- `Policy-driven`
+- `Gated execution`
+- `Test gate`
+
+详细说明见 [docs/AI_DEVELOPMENT_MODE.md](./docs/AI_DEVELOPMENT_MODE.md)。
+
+需求开发文档目录规范见 [docs/DOCS_ORGANIZATION.md](./docs/DOCS_ORGANIZATION.md)。
