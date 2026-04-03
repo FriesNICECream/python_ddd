@@ -64,7 +64,9 @@ Copy-Item .env.example .env
 至少确认以下配置：
 
 ```env
-DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/python_ddd
+APP_ENV=dev
+DEV_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/python_ddd
+PROD_DATABASE_URL=postgresql+psycopg://python_ddd_pass_001:python_ddd_pass_001@localhost:5432/python_ddd
 APP_NAME=Python DDD
 ACCESS_TOKEN_SECRET=change-me-in-production
 ACCESS_TOKEN_ALGORITHM=HS256
@@ -74,6 +76,12 @@ CORS_ALLOW_METHODS=["*"]
 CORS_ALLOW_HEADERS=["*"]
 CORS_ALLOW_CREDENTIALS=false
 ```
+
+说明：
+
+- `APP_ENV=dev` 时使用 `DEV_DATABASE_URL`
+- `APP_ENV=prod` 时使用 `PROD_DATABASE_URL`
+- 如果显式设置 `DATABASE_URL`，则优先使用该值，便于兼容旧部署方式或临时覆盖
 
 ### 5. 执行迁移
 
