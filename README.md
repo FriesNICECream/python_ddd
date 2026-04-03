@@ -113,6 +113,33 @@ poetry run uvicorn app.main:app --reload
 poetry run pytest
 ```
 
+## 服务器自动部署脚本
+
+仓库提供了 Linux 服务器部署脚本 `[scripts/deploy.sh](./scripts/deploy.sh)`，默认完成以下步骤：
+
+1. 使用 Poetry 安装生产依赖
+2. 执行 `alembic upgrade head`
+3. 以 `APP_ENV=prod` 启动 `uvicorn`
+4. 轮询 `http://127.0.0.1:8000/health` 做健康检查
+
+使用方式：
+
+```bash
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
+```
+
+可选环境变量：
+
+- `APP_HOST`：默认 `0.0.0.0`
+- `APP_PORT`：默认 `8000`
+- `PID_FILE`：默认 `run/uvicorn.pid`
+- `LOG_FILE`：默认 `logs/uvicorn.log`
+- `HEALTH_CHECK_RETRIES`：默认 `20`
+- `HEALTH_CHECK_INTERVAL`：默认 `3`
+
+如果健康检查失败，脚本会输出最近日志并停止刚启动的进程。
+
 ## Auth 模块
 
 - `POST /api/auth/register`：用户注册
