@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     access_token_secret: str = "change-me-in-production"
     access_token_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+    cors_allow_origins: list[str] = ["*"]
+    cors_allow_methods: list[str] = ["*"]
+    cors_allow_headers: list[str] = ["*"]
+    cors_allow_credentials: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
