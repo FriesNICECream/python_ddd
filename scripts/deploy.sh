@@ -31,6 +31,18 @@ require_command() {
   command -v "$1" >/dev/null 2>&1 || fail "缺少命令: $1"
 }
 
+require_python_command() {
+  if command -v python >/dev/null 2>&1; then
+    return
+  fi
+
+  if command -v python3 >/dev/null 2>&1; then
+    return
+  fi
+
+  fail "缺少命令: python 或 python3"
+}
+
 ensure_project_files() {
   [[ -f "$APP_DIR/pyproject.toml" ]] || fail "缺少 pyproject.toml，当前目录不是有效项目根目录"
   [[ -f "$APP_DIR/poetry.lock" ]] || fail "缺少 poetry.lock，请先在仓库内生成锁文件"
@@ -38,7 +50,7 @@ ensure_project_files() {
 }
 
 ensure_poetry_environment() {
-  require_command python
+  require_python_command
   require_command poetry
 
   log "检查 Poetry 项目配置"

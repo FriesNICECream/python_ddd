@@ -33,3 +33,4 @@ def test_deploy_script_checks_project_prerequisites() -> None:
     assert '缺少 pyproject.toml' in script_content
     assert '缺少 poetry.lock' in script_content
     assert '缺少 .env' in script_content
+    assert '缺少命令: python 或 python3' in script_content
