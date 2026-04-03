@@ -15,29 +15,130 @@ alembic/           # 数据库迁移
 
 ## 快速开始
 
-1. 安装依赖
+### 1. 安装 Poetry
+
+确认本机已安装 Poetry：
 
 ```bash
-pip install -e .
+poetry --version
 ```
 
-2. 配置环境变量（可选）
+### 2. 安装依赖
+
+在项目根目录执行：
+
+```bash
+poetry install
+```
+
+如果你希望为当前项目创建项目内专用虚拟环境，先执行：
+
+```bash
+poetry config virtualenvs.in-project true
+```
+
+然后再执行：
+
+```bash
+poetry install
+```
+
+本项目默认将 Poetry 作为依赖与虚拟环境管理工具使用，不要求将当前仓库打包安装为独立 Python 包。
+
+### 3. 配置环境变量
+
+复制环境变量示例文件：
 
 ```bash
 cp .env.example .env
 ```
 
-3. 执行迁移
+如果你使用的是 PowerShell，也可以执行：
 
-```bash
-alembic upgrade head
+```powershell
+Copy-Item .env.example .env
 ```
 
-4. 启动服务
+### 4. 按需修改 `.env`
+
+至少确认以下配置：
+
+```env
+APP_ENV=dev
+DEV_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/python_ddd
+PROD_DATABASE_URL=postgresql+psycopg://python_ddd_pass_001:python_ddd_pass_001@localhost:5432/python_ddd
+APP_NAME=Python DDD
+ACCESS_TOKEN_SECRET=change-me-in-production
+ACCESS_TOKEN_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+CORS_ALLOW_ORIGINS=["*"]
+CORS_ALLOW_METHODS=["*"]
+CORS_ALLOW_HEADERS=["*"]
+CORS_ALLOW_CREDENTIALS=false
+```
+
+说明：
+
+- `APP_ENV=dev` 时使用 `DEV_DATABASE_URL`
+- `APP_ENV=prod` 时使用 `PROD_DATABASE_URL`
+- 如果显式设置 `DATABASE_URL`，则优先使用该值，便于兼容旧部署方式或临时覆盖
+
+### 5. 执行迁移
+
+使用 Poetry 运行 Alembic：
 
 ```bash
-uvicorn app.main:app --reload
+poetry run alembic upgrade head
 ```
+
+### 6. 启动服务
+
+使用 Poetry 启动 FastAPI：
+
+```bash
+poetry run uvicorn app.main:app --reload
+```
+
+默认启动后可访问：
+
+- 服务地址：`http://127.0.0.1:8000`
+- 健康检查：`http://127.0.0.1:8000/health`
+- Swagger 文档：`http://127.0.0.1:8000/docs`
+
+### 7. 运行测试
+
+如需验证当前项目状态，可执行：
+
+```bash
+poetry run pytest
+```
+
+## 服务器自动部署脚本
+
+仓库提供了 Linux 服务器部署脚本 `[scripts/deploy.sh](./scripts/deploy.sh)`，默认完成以下步骤：
+
+1. 使用 Poetry 安装生产依赖
+2. 执行 `alembic upgrade head`
+3. 以 `APP_ENV=prod` 启动 `uvicorn`
+4. 轮询 `http://127.0.0.1:8000/health` 做健康检查
+
+使用方式：
+
+```bash
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
+```
+
+可选环境变量：
+
+- `APP_HOST`：默认 `0.0.0.0`
+- `APP_PORT`：默认 `8000`
+- `PID_FILE`：默认 `run/uvicorn.pid`
+- `LOG_FILE`：默认 `logs/uvicorn.log`
+- `HEALTH_CHECK_RETRIES`：默认 `20`
+- `HEALTH_CHECK_INTERVAL`：默认 `3`
+
+如果健康检查失败，脚本会输出最近日志并停止刚启动的进程。
 
 ## Auth 模块
 
