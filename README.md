@@ -168,3 +168,24 @@ chmod +x scripts/deploy.sh
 详细说明见 [docs/AI_DEVELOPMENT_MODE.md](./docs/AI_DEVELOPMENT_MODE.md)。
 
 需求开发文档目录规范见 [docs/DOCS_ORGANIZATION.md](./docs/DOCS_ORGANIZATION.md)。
+
+## Spec Kit 使用方式
+
+本仓库已接入 [GitHub Spec Kit](https://github.com/github/spec-kit)，用于把需求先沉淀为规格，再进入实现阶段。
+
+首次使用时，建议按以下顺序执行：
+
+```text
+$speckit-constitution
+$speckit-specify
+$speckit-plan
+$speckit-tasks
+$speckit-implement
+```
+
+执行约束：
+
+- `constitution` 需要遵守仓库根目录 `AGENTS.md` 与 `.specify/memory/constitution.md`
+- `specify` 阶段先写业务目标、边界、验收标准，不直接写技术实现细节
+- `plan` 与 `tasks` 阶段必须显式区分 domain、application、infrastructure、interfaces 的职责落点
+- `implement` 阶段完成后，仍必须补测试并执行 `pytest`
