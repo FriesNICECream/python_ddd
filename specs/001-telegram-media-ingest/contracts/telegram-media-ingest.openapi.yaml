@@ -1,0 +1,250 @@
+openapi: 3.1.0
+info:
+  title: Telegram Media Ingest API
+  version: 0.1.0
+  description: >
+    用于管理 Telegram 采集来源、触发增量采集以及查询影视资源沉淀结果的接口契约。
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/telegram-sources:
+    get:
+      summary: 查询采集来源列表
+      responses:
+        '200':
+          description: 返回已登记来源
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TelegramSource'
+                required: [items]
+    post:
+      summary: 新增 Telegram 采集来源
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTelegramSourceRequest'
+      responses:
+        '201':
+          description: 来源创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramSource'
+  /api/telegram-sources/{sourceId}/toggle:
+    post:
+      summary: 启用或禁用采集来源
+      parameters:
+        - in: path
+          name: sourceId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required: [enabled]
+      responses:
+        '200':
+          description: 状态切换成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramSource'
+  /api/telegram-ingestions/run:
+    post:
+      summary: 手动触发增量采集
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunIngestionRequest'
+      responses:
+        '202':
+          description: 采集任务已受理
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionRunResult'
+  /api/media-resources:
+    get:
+      summary: 查询影视资源列表
+      parameters:
+        - in: query
+          name: media_type
+          schema:
+            type: string
+            enum: [movie, series, unknown]
+        - in: query
+          name: curation_status
+          schema:
+            type: string
+            enum: [pending, curated, ignored]
+      responses:
+        '200':
+          description: 返回资源列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaResourceSummary'
+                required: [items]
+  /api/media-resources/{resourceId}:
+    get:
+      summary: 查询影视资源详情
+      parameters:
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 返回资源详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaResourceDetail'
+        '404':
+          description: 资源不存在
+components:
+  schemas:
+    CreateTelegramSourceRequest:
+      type: object
+      properties:
+        source_key:
+          type: string
+        display_name:
+          type: string
+        schedule_minutes:
+          type: integer
+          minimum: 1
+      required: [source_key, display_name, schedule_minutes]
+    TelegramSource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        source_key:
+          type: string
+        display_name:
+          type: string
+        enabled:
+          type: boolean
+        schedule_minutes:
+          type: integer
+        last_synced_at:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, source_key, display_name, enabled, schedule_minutes]
+    RunIngestionRequest:
+      type: object
+      properties:
+        source_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    IngestionRunResult:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+        source_count:
+          type: integer
+        message:
+          type: string
+      required: [accepted, source_count, message]
+    MediaResourceSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_title:
+          type: string
+        media_type:
+          type: string
+          enum: [movie, series, unknown]
+        curation_status:
+          type: string
+          enum: [pending, curated, ignored]
+        link_count:
+          type: integer
+      required: [id, display_title, media_type, curation_status, link_count]
+    MediaResourceDetail:
+      allOf:
+        - $ref: '#/components/schemas/MediaResourceSummary'
+        - type: object
+          properties:
+            canonical_title:
+              type: string
+            cover_url:
+              type: string
+              nullable: true
+            scrape_profile:
+              type: object
+              additionalProperties: true
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/CloudLink'
+            source_messages:
+              type: array
+              items:
+                $ref: '#/components/schemas/SourceMessage'
+          required: [canonical_title, scrape_profile, links, source_messages]
+    CloudLink:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        platform:
+          type: string
+        url:
+          type: string
+        extraction_code:
+          type: string
+          nullable: true
+        first_seen_at:
+          type: string
+          format: date-time
+      required: [id, platform, url, first_seen_at]
+    SourceMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        source_id:
+          type: string
+          format: uuid
+        published_at:
+          type: string
+          format: date-time
+        text_excerpt:
+          type: string
+      required: [id, source_id, published_at, text_excerpt]

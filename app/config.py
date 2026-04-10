@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     database_url: str | None = None
     dev_database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/python_ddd"
     prod_database_url: str = "postgresql+psycopg://python_ddd_pass_001:python_ddd_pass_001@localhost:5432/python_ddd"
+    telegram_api_id: int | None = None
+    telegram_api_hash: str | None = None
+    telegram_session_string: str | None = None
+    telegram_default_poll_interval_minutes: int = 30
+    telegram_ingest_batch_size: int = 100
     access_token_secret: str = "change-me-in-production"
     access_token_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60

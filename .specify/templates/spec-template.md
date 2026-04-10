@@ -5,6 +5,8 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
+> 语言要求：默认使用中文撰写规格内容；允许保留必要英文专业术语，但整体表述必须以中文为主。
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--

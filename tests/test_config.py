@@ -21,3 +21,13 @@ def test_settings_keep_database_url_override() -> None:
     settings = Settings(_env_file=None, app_env="prod", database_url=override_url)
 
     assert settings.database_url == override_url
+
+
+def test_settings_include_telegram_defaults() -> None:
+    settings = Settings(_env_file=None)
+
+    assert settings.telegram_api_id is None
+    assert settings.telegram_api_hash is None
+    assert settings.telegram_session_string is None
+    assert settings.telegram_default_poll_interval_minutes == 30
+    assert settings.telegram_ingest_batch_size == 100

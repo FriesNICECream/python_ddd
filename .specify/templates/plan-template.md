@@ -4,6 +4,7 @@
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**语言要求**: 默认使用中文撰写计划内容；允许保留必要英文专业术语，但整体表述必须以中文为主。
 
 ## Summary
 
